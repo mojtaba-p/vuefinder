@@ -62,7 +62,7 @@
           <div class="vuefinder__explorer__item-grid-content">
             <img src="data:image/png;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                  class="vuefinder__explorer__item-thumbnail lazy" v-if="(item.mime_type ?? '').startsWith('image') && app.showThumbnails"
-                 :data-src="app.requester.getPreviewUrl(app.fs.adapter, item)" :alt="item.basename" :key="item.path">
+                 :data-src="app.requester.getThumbnailUrl(app.fs.adapter, item)" :alt="item.basename" :key="item.path">
             <ItemIcon :type="item.type" v-else/>
             <div class="vuefinder__explorer__item-extension"
                  v-if="!((item.mime_type ?? '').startsWith('image') && app.showThumbnails) && item.type !== 'dir'" >

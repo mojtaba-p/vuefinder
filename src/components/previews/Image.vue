@@ -15,7 +15,7 @@
     </div>
 
     <div class="vuefinder__image-preview__image-container">
-      <img ref="image" class="vuefinder__image-preview__image" :src="app.requester.getPreviewUrl(app.modal.data.adapter, app.modal.data.item)" alt="">
+      <img ref="image" class="vuefinder__image-preview__image" :src="app.requester.getThumbnailUrl(app.modal.data.adapter, app.modal.data.item)" alt="">
     </div>
 
     <message v-if="message.length" @hidden="message=''" :error="isError">{{ message }}</message>

@@ -103,7 +103,7 @@ export class Requester {
             /** @type {Record<String,*>|FormData} */
             if (!(body instanceof FormData)) {
                 // JSON
-                newBody = {...body};
+                newBody = { ...body };
                 if (config.body != null) {
                     Object.assign(newBody, this.config.body);
                 }
@@ -167,7 +167,7 @@ export class Requester {
         const transform = this.transformRequestParams({
             url: '',
             method: 'get',
-            params: {q: 'download', adapter, path: node.path}
+            params: { q: 'download', adapter, path: node.path }
         });
         return transform.url + '?' + new URLSearchParams(transform.params).toString()
     }
@@ -187,12 +187,32 @@ export class Requester {
         const transform = this.transformRequestParams({
             url: '',
             method: 'get',
-            params: {q: 'preview', adapter, path: node.path}
+            params: { q: 'preview', adapter, path: node.path }
         });
         return transform.url + '?' + new URLSearchParams(transform.params).toString()
     }
 
-
+    /**
+     * Get thumbnail url
+     * @param {String} adapter
+     * @param {String} node
+     * @param {String} node.path
+     * @param {String=} node.url
+     * @return {String}
+     */
+    getThumbnailUrl(adapter, node) {
+        if (node.url != null) {
+            return node.url
+        }
+        const transform = this.transformRequestParams({
+            url: '',
+            method: 'get',
+            params: { q: 'thumbnail', adapter, path: node.path }
+        });
+        return transform.url + '?' + new URLSearchParams(transform.params).toString()
+    }
+    
+    
     /**
      * Send request
      * @param {Object} input
@@ -258,7 +278,7 @@ export function buildRequester(userConfig) {
         fetchParams: {}
     };
     if (typeof userConfig === 'string') {
-        Object.assign(config, {baseUrl: userConfig});
+        Object.assign(config, { baseUrl: userConfig });
     } else {
         Object.assign(config, userConfig);
     }
@@ -266,4 +286,4 @@ export function buildRequester(userConfig) {
     return new Requester(config);
 }
 
-export {}
+export { }
