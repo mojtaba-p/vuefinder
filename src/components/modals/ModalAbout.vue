@@ -1,7 +1,7 @@
 <template>
   <ModalLayout>
     <div class="vuefinder__about-modal__content">
-      <ModalHeader :icon="AboutSVG" :title="'Vuefinder ' + app.version"></ModalHeader>
+      <ModalHeader :icon="AboutSVG" :title="'Settings'"></ModalHeader>
 
       <div class="vuefinder__about-modal__main">
         <div>

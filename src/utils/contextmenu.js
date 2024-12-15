@@ -1,11 +1,12 @@
-import {computed} from 'vue';
-import {FEATURES} from "../features.js";
+import { computed } from 'vue';
+import { FEATURES } from "../features.js";
 import ModalNewFolder from "../components/modals/ModalNewFolder.vue";
 import ModalPreview from "../components/modals/ModalPreview.vue";
 import ModalArchive from "../components/modals/ModalArchive.vue";
 import ModalUnarchive from "../components/modals/ModalUnarchive.vue";
 import ModalRename from "../components/modals/ModalRename.vue";
 import ModalDelete from "../components/modals/ModalDelete.vue";
+import ModalCTC from '../components/modals/ModalCTC.vue';
 
 /**
  * @typedef {typeof import('../ServiceContainer.js')['default']} ServiceContainer
@@ -59,9 +60,9 @@ export class SimpleItem {
     this.link = link
     this.options = Object.assign(
       {
-        needsSearchQuery: false, 
+        needsSearchQuery: false,
         target: 'one',
-      }, 
+      },
       options,
     )
   }
@@ -120,48 +121,48 @@ function itemBundle(templates, options) {
 const templateMap = {
   newfolder: {
     key: FEATURES.NEW_FOLDER,
-    title: ({t}) => t('New Folder'),
+    title: ({ t }) => t('New Folder'),
     action: (app) => app.modal.open(ModalNewFolder),
   },
   selectAll: {
-    title: ({t}) => t('Select All'),
+    title: ({ t }) => t('Select All'),
     action: (app) => app.dragSelect.selectAll(),
   },
   pinFolder: {
-    title: ({t}) => t('Pin Folder'),
+    title: ({ t }) => t('Pin Folder'),
     action: (app, selectedItems) => {
-        app.pinnedFolders = app.pinnedFolders.concat(selectedItems.value);
-        app.storage.setStore('pinned-folders', app.pinnedFolders);
+      app.pinnedFolders = app.pinnedFolders.concat(selectedItems.value);
+      app.storage.setStore('pinned-folders', app.pinnedFolders);
     },
   },
 
   unpinFolder: {
-    title: ({t}) => t('Unpin Folder'),
+    title: ({ t }) => t('Unpin Folder'),
     action: (app, selectedItems) => {
-        app.pinnedFolders = app.pinnedFolders.filter(fav => !selectedItems.value.find(item => item.path === fav.path));
-        app.storage.setStore('pinned-folders', app.pinnedFolders);
+      app.pinnedFolders = app.pinnedFolders.filter(fav => !selectedItems.value.find(item => item.path === fav.path));
+      app.storage.setStore('pinned-folders', app.pinnedFolders);
     },
   },
   delete: {
     key: FEATURES.DELETE,
-    title: ({t}) => t('Delete'),
+    title: ({ t }) => t('Delete'),
     action: (app, selectedItems) => {
-      app.modal.open(ModalDelete, {items: selectedItems});
+      app.modal.open(ModalDelete, { items: selectedItems });
     },
   },
   refresh: {
-    title: ({t}) => t('Refresh'),
+    title: ({ t }) => t('Refresh'),
     action: (app) => {
-      app.emitter.emit('vf-fetch', {params: {q: 'index', adapter: app.fs.adapter, path: app.fs.data.dirname}});
+      app.emitter.emit('vf-fetch', { params: { q: 'index', adapter: app.fs.adapter, path: app.fs.data.dirname } });
     },
   },
   preview: {
     key: FEATURES.PREVIEW,
-    title: ({t}) => t('Preview'),
-    action: (app, selectedItems) => app.modal.open(ModalPreview, {adapter: app.fs.adapter, item: selectedItems.value[0]}),
+    title: ({ t }) => t('Preview'),
+    action: (app, selectedItems) => app.modal.open(ModalPreview, { adapter: app.fs.adapter, item: selectedItems.value[0] }),
   },
   open: {
-    title: ({t}) => t('Open'),
+    title: ({ t }) => t('Open'),
     action: (app, selectedItems) => {
       app.emitter.emit('vf-search-exit');
       app.emitter.emit('vf-fetch', {
@@ -174,7 +175,7 @@ const templateMap = {
     },
   },
   openDir: {
-    title: ({t}) => t('Open containing folder'),
+    title: ({ t }) => t('Open containing folder'),
     action: (app, selectedItems) => {
       app.emitter.emit('vf-search-exit');
       app.emitter.emit('vf-fetch', {
@@ -189,23 +190,30 @@ const templateMap = {
   download: {
     key: FEATURES.DOWNLOAD,
     link: (app, selectedItems) => app.requester.getDownloadUrl(app.fs.adapter, selectedItems.value[0]),
-    title: ({t}) => t('Download'),
-    action: () => {},
+    title: ({ t }) => t('Download'),
+    action: () => { },
   },
   archive: {
     key: FEATURES.ARCHIVE,
-    title: ({t}) => t('Archive'),
-    action: (app, selectedItems) => app.modal.open(ModalArchive, {items: selectedItems}),
+    title: ({ t }) => t('Archive'),
+    action: (app, selectedItems) => app.modal.open(ModalArchive, { items: selectedItems }),
   },
   unarchive: {
     key: FEATURES.UNARCHIVE,
-    title: ({t}) => t('Unarchive'),
-    action: (app, selectedItems) => app.modal.open(ModalUnarchive, {items: selectedItems}),
+    title: ({ t }) => t('Unarchive'),
+    action: (app, selectedItems) => app.modal.open(ModalUnarchive, { items: selectedItems }),
   },
   rename: {
     key: FEATURES.RENAME,
-    title: ({t}) => t('Rename'),
-    action: (app, selectedItems) => app.modal.open(ModalRename, {items: selectedItems}),
+    title: ({ t }) => t('Rename'),
+    action: (app, selectedItems) => app.modal.open(ModalRename, { items: selectedItems }),
+  },
+
+  copyToCloud: {
+    key: FEATURES.CTC,
+    title: ({ t }) => t('Copy to Cloud'),
+    action: (app, selectedItems) => app.modal.open(ModalCTC, { items: selectedItems }),
+
   }
 };
 
@@ -217,7 +225,7 @@ export const menuItems = [
   ...itemBundle([templateMap.refresh, templateMap.selectAll, templateMap.newfolder], {
     target: null,
   }),
-  ...itemBundle([templateMap.refresh, templateMap.archive, templateMap.delete], {
+  ...itemBundle([templateMap.refresh, templateMap.archive, templateMap.delete, templateMap.copyToCloud], {
     target: 'many'
   }),
   ...itemBundle([templateMap.open], {
@@ -231,10 +239,10 @@ export const menuItems = [
     targetType: 'dir',
     show: (app, ctx) => app.pinnedFolders.findIndex((item) => item.path === ctx.target?.path) === -1
   }),
-  ...itemBundle([templateMap.preview, templateMap.download], {
+  ...itemBundle([templateMap.preview, templateMap.download, templateMap.copyToCloud], {
     show: (app, ctx) => ctx.target?.type !== 'dir'
   }),
-  ...itemBundle([templateMap.rename], {numItems: 'one',}),
+  ...itemBundle([templateMap.rename], { numItems: 'one', }),
   ...itemBundle([templateMap.unarchive], {
     mimeType: 'application/zip',
   }),
